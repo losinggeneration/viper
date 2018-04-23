@@ -1007,18 +1007,24 @@ func (v *Viper) find(lcaseKey string, flagDefault bool) interface{} {
 			}
 		}
 		// last item, no need to check shadowing
-	}
 
-	// it could also be a key prefix, search for that prefix to get the values from
-	// pflags that match it
-	sub := make(map[string]interface{})
-	for key, val := range v.pflags {
-		if flagDefault && strings.HasPrefix(key, lcaseKey) {
-			sub[strings.TrimPrefix(key, lcaseKey+".")] = val.ValueString()
+		// it could also be a key prefix, search for that prefix to get the values from
+		// pflags that match it
+		sub := make(map[string]interface{})
+		for _, key := range v.AllKeys() {
+			if strings.HasPrefix(key, lcaseKey) {
+				value := v.Get(key)
+				keypath := strings.Split(lcaseKey, v.keyDelim)
+				path := strings.Split(key, v.keyDelim)[len(keypath)-1:]
+				lastKey := strings.ToLower(path[len(path)-1])
+				deepestMap := deepSearch(sub, path[1:len(path)-1])
+				// set innermost value
+				deepestMap[lastKey] = value
+			}
 		}
-	}
-	if len(sub) != 0 {
-		return sub
+		if len(sub) != 0 {
+			return sub
+		}
 	}
 
 	return nil
