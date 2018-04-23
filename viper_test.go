@@ -902,13 +902,13 @@ func TestSubPflags(t *testing.T) {
 	v := New()
 
 	// same as yamlExample, without hobbies
-	v.BindPFlag("name", &pflag.Flag{Value: newStringValue("steve"), Changed: true})
-	v.BindPFlag("clothing.jacket", &pflag.Flag{Value: newStringValue("leather"), Changed: true})
-	v.BindPFlag("clothing.trousers", &pflag.Flag{Value: newStringValue("denim"), Changed: true})
-	v.BindPFlag("clothing.pants.size", &pflag.Flag{Value: newStringValue("large"), Changed: true})
-	v.BindPFlag("age", &pflag.Flag{Value: newStringValue("35"), Changed: true})
-	v.BindPFlag("eyes", &pflag.Flag{Value: newStringValue("brown"), Changed: true})
-	v.BindPFlag("beard", &pflag.Flag{Value: newStringValue("yes"), Changed: true})
+	v.BindPFlag("name", &pflag.Flag{Value: newStringValue("pflag-steve"), Changed: true})
+	v.BindPFlag("clothing.jacket", &pflag.Flag{Value: newStringValue("pflag-leather"), Changed: true})
+	v.BindPFlag("clothing.trousers", &pflag.Flag{Value: newStringValue("pflag-denim"), Changed: true})
+	v.BindPFlag("clothing.pants.size", &pflag.Flag{Value: newStringValue("pflag-large"), Changed: true})
+	v.BindPFlag("age", &pflag.Flag{Value: newStringValue("53"), Changed: true})
+	v.BindPFlag("eyes", &pflag.Flag{Value: newStringValue("pflag-brown"), Changed: true})
+	v.BindPFlag("beard", &pflag.Flag{Value: newStringValue("no"), Changed: true})
 
 	type pants struct {
 		Size string

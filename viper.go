@@ -652,15 +652,25 @@ func (v *Viper) Get(key string) interface{} {
 func Sub(key string) *Viper { return v.Sub(key) }
 func (v *Viper) Sub(key string) *Viper {
 	subv := New()
-	data := v.Get(key)
-	if data == nil {
-		return nil
-	}
 
-	if reflect.TypeOf(data).Kind() == reflect.Map {
-		subv.config = cast.ToStringMap(data)
+	key = strings.ToLower(key)
+	for _, k := range v.AllKeys() {
+		if strings.HasPrefix(k, key) {
+			value := v.Get(k)
+			keypath := strings.Split(key, v.keyDelim)
+			path := strings.Split(k, v.keyDelim)[len(keypath)-1:]
+			lastKey := strings.ToLower(path[len(path)-1])
+			if len(path) > 1 {
+				deepestMap := deepSearch(subv.config, path[1:len(path)-1])
+				// set innermost value
+				deepestMap[lastKey] = value
+			}
+		}
+	}
+	if len(subv.config) != 0 {
 		return subv
 	}
+
 	return nil
 }
 
@@ -1008,22 +1018,9 @@ func (v *Viper) find(lcaseKey string, flagDefault bool) interface{} {
 		}
 		// last item, no need to check shadowing
 
-		// it could also be a key prefix, search for that prefix to get the values from
-		// pflags that match it
-		sub := make(map[string]interface{})
-		for _, key := range v.AllKeys() {
-			if strings.HasPrefix(key, lcaseKey) {
-				value := v.Get(key)
-				keypath := strings.Split(lcaseKey, v.keyDelim)
-				path := strings.Split(key, v.keyDelim)[len(keypath)-1:]
-				lastKey := strings.ToLower(path[len(path)-1])
-				deepestMap := deepSearch(sub, path[1:len(path)-1])
-				// set innermost value
-				deepestMap[lastKey] = value
-			}
-		}
-		if len(sub) != 0 {
-			return sub
+		sub := v.Sub(lcaseKey)
+		if sub != nil {
+			return sub.AllSettings()
 		}
 	}
 
